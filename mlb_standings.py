@@ -25,7 +25,6 @@ def get_top5_overall(season="2025", top_n=5):
     for league_id in (103, 104):  # 103=AL, 104=NL
         data = statsapi.get("standings", {"leagueId": league_id, "season": season})
         for div_rec in data.get("records", []):
-            # For division name only if needed elsewhere
             for tr in div_rec.get("teamRecords", []):
                 pct_str = (
                     tr.get("winningPercentage")
@@ -39,7 +38,6 @@ def get_top5_overall(season="2025", top_n=5):
                     "losses":  tr["losses"],
                     "pct_str": pct_str,
                 })
-    # Sort descending by pct, take top N
     all_recs.sort(key=lambda x: pct_to_float(x["pct_str"]), reverse=True)
     return all_recs[:top_n]
 
@@ -56,9 +54,9 @@ def print_table_nlcentral(records, season="2025"):
     print()
 
 def print_table_top5(records, season="2025"):
-    print(f"Top {len(records)} MLB Teams by Wins/Losses (Season {season})")
-    # Rank:4, Team:25, W:3, L:3, GB:5
-    print(f"{'Rank':>4s} {'Team':25s} {'W':>3s} {'L':>3s} {'GB':>5s}")
+    print(f"MLB Overall Standings ({season})")
+    # Team:25, W:3, L:3, GB:5
+    print(f"{'Team':25s} {'W':>3s} {'L':>3s} {'GB':>5s}")
 
     # Leader's record for GB calculations
     leader = records[0]
@@ -74,7 +72,6 @@ def print_table_top5(records, season="2025"):
         else:
             gb_str = f"{compute_gb(r['wins'], r['losses']):.1f}"
         print(
-            f"{idx:4d} "
             f"{r['team']:25s} "
             f"{r['wins']:3d} "
             f"{r['losses']:3d} "
