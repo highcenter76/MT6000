@@ -6,7 +6,7 @@ Show Chicago Cubs games between two dates.
 
 Usage:
   python3 nextgame.py
-    – Defaults to today (start) and tomorrow (end), non-interactive.
+    – Defaults to today (start) and today (end), non-interactive.
 
   python3 nextgame.py -i
     – Interactive mode: prompts for start/end dates individually
@@ -45,13 +45,12 @@ def get_date_range(interactive=False, daterange_arg=None):
     Modes:
       • interactive=True: prompt separately for start & end.
       • daterange_arg provided: parse as "mm/dd/YYYY-mm/dd/YYYY".
-      • neither: default to today/tomorrow.
+      • neither: default to today/today.
     """
-    # compute defaults
+    # compute default: today only
     today_utc    = datetime.utcnow()
-    tomorrow_utc = today_utc + timedelta(days=1)
     default_start = today_utc.strftime("%m/%d/%Y")
-    default_end   = tomorrow_utc.strftime("%m/%d/%Y")
+    default_end   = default_start
 
     if daterange_arg:
         parts = daterange_arg.split("-", 1)
@@ -82,6 +81,10 @@ def print_cubs_schedule(start_date, end_date):
         include_series_status=True
     )
 
+    if not games:
+        print("No Games")
+        return
+
     # time zone setup
     utc     = pytz.utc
     central = pytz.timezone("America/Chicago")
@@ -94,7 +97,8 @@ def print_cubs_schedule(start_date, end_date):
         game_dt_chi = game_dt_utc.astimezone(central)
 
         # formatted fields
-        date_str     = game_dt_chi.strftime("%b-%d-%a")   # e.g. Aug-01-Fri
+        # format as DDD-dd-MMM, e.g. Mon-01-Jan
+        date_str     = game_dt_chi.strftime("%a-%d-%b")
         time_24      = game_dt_chi.strftime("%H:%M")      # 24-hour HH:MM
         venue        = g.get("venue_name", "Unknown Venue")
         away_name    = g.get("away_name", "Unknown Away")
